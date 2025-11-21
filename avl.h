@@ -4,25 +4,28 @@
 #include "cliente.h"
 #include "arvore_decisao.h"
 
-typedef struct NoAVL {
-    Cliente* cliente;
-    int altura;
-    struct NoAVL *esquerda;
-    struct NoAVL *direita;
-} NoAVL;
+typedef struct NoAVL NoAVL;
 
-NoAVL* avl_criar();
+struct NoAVL
+{
+	Cliente *cliente;
+	int altura;
+	struct NoAVL *esquerda;
+	struct NoAVL *direita;
+};
 
-void avl_liberar(NoAVL* raiz);
+NoAVL *avl_criar();
 
-NoAVL* avl_inserir(NoAVL* raiz, Cliente* c, NoDecisao* regras);
+void avl_liberar(NoAVL *raiz);
 
-NoAVL* avl_buscar(NoAVL* raiz, int id);
+NoAVL *avl_inserir(NoAVL *raiz, Cliente *c, NoDecisao *regras);
 
-void avl_imprimir_em_ordem(NoAVL* raiz);
+NoAVL *avl_buscar(NoAVL *raiz, int id);
 
-NoAVL* avl_atualizar_nome(NoAVL* raiz, int id, const char* novo_nome);
+void avl_imprimir_em_ordem(NoAVL *raiz);
 
-NoAVL* avl_realizar_compra(NoAVL* raiz, int id, float valor, int mes, int ano, NoDecisao* regras);
+NoAVL *avl_atualizar_nome(NoAVL *raiz, int id, const char *novo_nome);
+
+NoAVL *avl_realizar_compra(NoAVL *raiz, int id, float valor, int mes, int ano, NoDecisao *regras);
 
 #endif

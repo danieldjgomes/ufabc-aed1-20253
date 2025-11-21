@@ -1,140 +1,162 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../include/avl.h"
+#include "avl.h"
 
-int max(int a, int b) {
-    return (a > b) ? a : b;
+int max(int a, int b)
+{
+	return (a > b) ? a : b;
 }
 
-int avl_altura(NoAVL* no) {
-    if (no == NULL) return -1;
-    return no->altura;
+int avl_altura(NoAVL *no)
+{
+	if (no == NULL)
+		return -1;
+	return no->altura;
 }
 
-int avl_fator_balanceamento(NoAVL* no) {
-    if (no == NULL) return 0;
-    return avl_altura(no->esquerda) - avl_altura(no->direita);
+int avl_fator_balanceamento(NoAVL *no)
+{
+	if (no == NULL)
+		return 0;
+	return avl_altura(no->esquerda) - avl_altura(no->direita);
 }
 
-NoAVL* avl_criar() {
-    return NULL;
+NoAVL *avl_criar()
+{
+	return NULL;
 }
 
-void avl_liberar(NoAVL* raiz) {
-    if (raiz != NULL) {
-        avl_liberar(raiz->esquerda);
-        avl_liberar(raiz->direita);
-        destruir_cliente(raiz->cliente);
-        free(raiz);
-    }
+void avl_liberar(NoAVL *raiz)
+{
+	if (raiz != NULL)
+	{
+		avl_liberar(raiz->esquerda);
+		avl_liberar(raiz->direita);
+		destruir_cliente(raiz->cliente);
+		free(raiz);
+	}
 }
 
-NoAVL* rotacao_direita(NoAVL* y) {
-    NoAVL* x = y->esquerda;
-    NoAVL* T2 = x->direita;
+NoAVL *rotacao_direita(NoAVL *y)
+{
+	NoAVL *x = y->esquerda;
+	NoAVL *T2 = x->direita;
 
-    x->direita = y;
-    y->esquerda = T2;
+	x->direita = y;
+	y->esquerda = T2;
 
-    y->altura = max(avl_altura(y->esquerda), avl_altura(y->direita)) + 1;
-    x->altura = max(avl_altura(x->esquerda), avl_altura(x->direita)) + 1;
+	y->altura = max(avl_altura(y->esquerda), avl_altura(y->direita)) + 1;
+	x->altura = max(avl_altura(x->esquerda), avl_altura(x->direita)) + 1;
 
-    return x;
+	return x;
 }
 
-NoAVL* rotacao_esquerda(NoAVL* x) {
-    NoAVL* y = x->direita;
-    NoAVL* T2 = y->esquerda;
+NoAVL *rotacao_esquerda(NoAVL *x)
+{
+	NoAVL *y = x->direita;
+	NoAVL *T2 = y->esquerda;
 
-    y->esquerda = x;
-    x->direita = T2;
+	y->esquerda = x;
+	x->direita = T2;
 
-    x->altura = max(avl_altura(x->esquerda), avl_altura(x->direita)) + 1;
-    y->altura = max(avl_altura(y->esquerda), avl_altura(y->direita)) + 1;
+	x->altura = max(avl_altura(x->esquerda), avl_altura(x->direita)) + 1;
+	y->altura = max(avl_altura(y->esquerda), avl_altura(y->direita)) + 1;
 
-    return y;
+	return y;
 }
 
-NoAVL* avl_inserir(NoAVL* no, Cliente* c, NoDecisao* regras) {
-    if (no == NULL) {
-       
-        NoAVL* novo = (NoAVL*) malloc(sizeof(NoAVL));
-        novo->cliente = c;
-        novo->esquerda = NULL;
-        novo->direita = NULL;
-        novo->altura = 0;
-        return novo;
-    }
+NoAVL *avl_inserir(NoAVL *no, Cliente *c, NoDecisao *regras)
+{
+	if (no == NULL)
+	{
 
-    if (c->id < no->cliente->id)
-        no->esquerda = avl_inserir(no->esquerda, c, regras);
-    else if (c->id > no->cliente->id)
-        no->direita = avl_inserir(no->direita, c, regras);
-    else {
-        // ID duplicado não permitido
-        return no;
-    }
+		NoAVL *novo = (NoAVL *)malloc(sizeof(NoAVL));
+		novo->cliente = c;
+		novo->esquerda = NULL;
+		novo->direita = NULL;
+		novo->altura = 0;
+		return novo;
+	}
 
-    no->altura = 1 + max(avl_altura(no->esquerda), avl_altura(no->direita));
+	if (c->id < no->cliente->id)
+		no->esquerda = avl_inserir(no->esquerda, c, regras);
+	else if (c->id > no->cliente->id)
+		no->direita = avl_inserir(no->direita, c, regras);
+	else
+	{
+		// ID duplicado não permitido
+		return no;
+	}
 
-    int balance = avl_fator_balanceamento(no);
+	no->altura = 1 + max(avl_altura(no->esquerda), avl_altura(no->direita));
 
-    // Caso Esquerda-Esquerda
-    if (balance > 1 && c->id < no->esquerda->cliente->id)
-        return rotacao_direita(no);
+	int balance = avl_fator_balanceamento(no);
 
-    // Caso Direita-Direita
-    if (balance < -1 && c->id > no->direita->cliente->id)
-        return rotacao_esquerda(no);
+	// Caso Esquerda-Esquerda
+	if (balance > 1 && c->id < no->esquerda->cliente->id)
+		return rotacao_direita(no);
 
-    // Caso Esquerda-Direita
-    if (balance > 1 && c->id > no->esquerda->cliente->id) {
-        no->esquerda = rotacao_esquerda(no->esquerda);
-        return rotacao_direita(no);
-    }
+	// Caso Direita-Direita
+	if (balance < -1 && c->id > no->direita->cliente->id)
+		return rotacao_esquerda(no);
 
-    // Caso Direita-Esquerda
-    if (balance < -1 && c->id < no->direita->cliente->id) {
-        no->direita = rotacao_direita(no->direita);
-        return rotacao_esquerda(no);
-    }
+	// Caso Esquerda-Direita
+	if (balance > 1 && c->id > no->esquerda->cliente->id)
+	{
+		no->esquerda = rotacao_esquerda(no->esquerda);
+		return rotacao_direita(no);
+	}
 
-    return no;
+	// Caso Direita-Esquerda
+	if (balance < -1 && c->id < no->direita->cliente->id)
+	{
+		no->direita = rotacao_direita(no->direita);
+		return rotacao_esquerda(no);
+	}
+
+	return no;
 }
 
-NoAVL* avl_buscar(NoAVL* raiz, int id) {
-    if (raiz == NULL || raiz->cliente->id == id)
-        return raiz;
+NoAVL *avl_buscar(NoAVL *raiz, int id)
+{
+	if (raiz == NULL || raiz->cliente->id == id)
+		return raiz;
 
-    if (id < raiz->cliente->id)
-        return avl_buscar(raiz->esquerda, id);
+	if (id < raiz->cliente->id)
+		return avl_buscar(raiz->esquerda, id);
 
-    return avl_buscar(raiz->direita, id);
+	return avl_buscar(raiz->direita, id);
 }
 
-void avl_imprimir_em_ordem(NoAVL* raiz) {
-    if (raiz != NULL) {
-        avl_imprimir_em_ordem(raiz->esquerda);
-        imprimir_cliente(raiz->cliente);
-        avl_imprimir_em_ordem(raiz->direita);
-    }
+void avl_imprimir_em_ordem(NoAVL *raiz)
+{
+	if (raiz != NULL)
+	{
+		avl_imprimir_em_ordem(raiz->esquerda);
+		imprimir_cliente(raiz->cliente);
+		avl_imprimir_em_ordem(raiz->direita);
+	}
 }
 
-NoAVL* avl_atualizar_nome(NoAVL* raiz, int id, const char* novo_nome) {
-    NoAVL* no = avl_buscar(raiz, id);
-    if (no != NULL) {
-        strncpy(no->cliente->nome, novo_nome, sizeof(no->cliente->nome) - 1);
-        no->cliente->nome[sizeof(no->cliente->nome) - 1] = '\0';
-    }
-    return raiz;
+NoAVL *avl_atualizar_nome(NoAVL *raiz, int id, const char *novo_nome)
+{
+	NoAVL *no = avl_buscar(raiz, id);
+	if (no != NULL)
+	{
+		strncpy(no->cliente->nome, novo_nome, sizeof(no->cliente->nome) - 1);
+		no->cliente->nome[sizeof(no->cliente->nome) - 1] = '\0';
+	}
+	return raiz;
 }
 
-NoAVL* avl_realizar_compra(NoAVL* raiz, int id, float valor, int mes, int ano, NoDecisao* regras) {
-    NoAVL* no = avl_buscar(raiz, id);
-    if (no != NULL) {
-        no->cliente->consumo_mes_atual += valor;
-        no->cliente->visitas_mes_atual++;
-    }
-    return raiz;
+NoAVL *avl_realizar_compra(NoAVL *raiz, int id, float valor, int mes, int ano, NoDecisao *regras)
+{
+	NoAVL *no = avl_buscar(raiz, id);
+	if (no != NULL)
+	{
+		no->cliente->consumo_mes_atual += valor;
+		no->cliente->visitas_mes_atual++;
+	}
+	return raiz;
 }

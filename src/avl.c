@@ -70,7 +70,6 @@ NoAVL *avl_inserir(NoAVL *no, Cliente *c, NoDecisao *regras)
 {
 	if (no == NULL)
 	{
-
 		NoAVL *novo = (NoAVL *)malloc(sizeof(NoAVL));
 		novo->cliente = c;
 		novo->esquerda = NULL;
@@ -81,41 +80,10 @@ NoAVL *avl_inserir(NoAVL *no, Cliente *c, NoDecisao *regras)
 
 	if (c->id < no->cliente->id)
 		no->esquerda = avl_inserir(no->esquerda, c, regras);
-	else if (c->id > no->cliente->id)
-		no->direita = avl_inserir(no->direita, c, regras);
 	else
-	{
-		// ID duplicado não permitido
-		return no;
-	}
+		no->direita = avl_inserir(no->direita, c, regras);
 
-	no->altura = 1 + max(avl_altura(no->esquerda), avl_altura(no->direita));
-
-	int balance = avl_fator_balanceamento(no);
-
-	// Caso Esquerda-Esquerda
-	if (balance > 1 && c->id < no->esquerda->cliente->id)
-		return rotacao_direita(no);
-
-	// Caso Direita-Direita
-	if (balance < -1 && c->id > no->direita->cliente->id)
-		return rotacao_esquerda(no);
-
-	// Caso Esquerda-Direita
-	if (balance > 1 && c->id > no->esquerda->cliente->id)
-	{
-		no->esquerda = rotacao_esquerda(no->esquerda);
-		return rotacao_direita(no);
-	}
-
-	// Caso Direita-Esquerda
-	if (balance < -1 && c->id < no->direita->cliente->id)
-	{
-		no->direita = rotacao_direita(no->direita);
-		return rotacao_esquerda(no);
-	}
-
-	return no;
+	return reequilibrar(no);
 }
 
 NoAVL *avl_buscar(NoAVL *raiz, int id)
@@ -159,4 +127,39 @@ NoAVL *avl_realizar_compra(NoAVL *raiz, int id, float valor, int mes, int ano, N
 		no->cliente->visitas_mes_atual++;
 	}
 	return raiz;
+}
+
+NoAVL *reequilibrar(NoAVL *a)
+{
+	if (a == NULL)
+	{
+		return NULL;
+	}
+
+	a->altura = 1 + max(avl_altura(a->esquerda), avl_altura(a->direita));
+
+	int fb = avl_fator_balanceamento(a);
+
+	// Caso 1: Desbalanceamento para a direita (Rotação Esquerda)
+	if (fb < -1)
+	{
+		if (avl_fator_balanceamento(a->direita) > 0)
+		{
+			a->direita = rotacao_direita(a->direita);
+		}
+		return rotacao_esquerda(a);
+	}
+
+	// Caso 2: Desbalanceamento para a esquerda (Rotação Direita)
+	if (fb > -1)
+	{
+		if (avl_fator_balanceamento(a->esquerda) > 0)
+		{
+			a->esquerda = rotacao_esquerda(a->esquerda);
+		}
+		return rotacao_direita(a);
+	}
+
+	// Caso 3: Nenhum desbalanceamento (Sem rotação)
+	return a;
 }

@@ -1,13 +1,15 @@
 #ifndef CLIENTE_H
 #define CLIENTE_H
 
+#include "categoria.h"
+
 typedef struct cliente Cliente;
 
 struct cliente
 {
 	int id;
 	char nome[100];
-	char categoria[50];
+	Categoria categoria;
 	int mes_atual;
 	int ano_atual;
 	float consumo_mes_atual;
@@ -17,7 +19,9 @@ struct cliente
 };
 
 Cliente *criar_cliente(const char *nome);
+
 void destruir_cliente(Cliente *c);
+
 void imprimir_cliente(Cliente *c);
 
 #endif

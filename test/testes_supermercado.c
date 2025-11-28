@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "cliente.h"
-#include "arvore_decisao.h"
-#include "avl.h"
+#include "../src/cliente.h"
+#include "../src/arvore_decisao.h"
+#include "../src/avl.h"
 
 // --- Cores e Formatação para Terminal ---
 #define COR_RESET "\033[0m"
@@ -262,7 +262,7 @@ void teste_ids_duplicados() {
 }
 
 void teste_caos() {
-    print_header("TESTE 7: Teste de Caos (Valores Extremos)");
+    print_header("TESTE 7: Teste de Valores Extremos");
     NoAVL* avl = avl_criar();
     NoDecisao* regras = setup_regras();
     

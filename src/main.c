@@ -154,11 +154,15 @@ int main() {
             printf("ID do Cliente: ");
             scanf("%d", &id);
 
-            avl_realizar_compra(avl, id, valor, mes_atual_sistema, ano_atual_sistema, regras);
             NoAVL* no = avl_buscar(avl, id);
             if (no == NULL) {
                 printf("Cliente nao encontrado.\n");
             } else {
+                printf("Valor da Compra: ");
+                scanf("%f", &valor);
+                
+                avl_realizar_compra(avl, id, valor, mes_atual_sistema, ano_atual_sistema, regras);
+
                 printf("\nCompra registrada e perfil recalculado:\n");
                 imprimir_cliente(no->cliente);
             }

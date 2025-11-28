@@ -76,5 +76,7 @@ void aplicar_regras_arvore(NoDecisao* raiz, Cliente* c) {
 }
 
 void classificar_cliente_mensal(NoDecisao* raiz, Cliente* c, int mes_atual, int ano_atual) {
+    (void)mes_atual; 
+    (void)ano_atual;
     aplicar_regras_arvore(raiz, c);
 }

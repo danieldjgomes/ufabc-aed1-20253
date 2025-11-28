@@ -112,7 +112,7 @@ int main() {
             if (len > 0 && nome[len-1] == '\n') nome[len-1] = '\0';
 
             Cliente* c = criar_cliente(nome);
-            avl = avl_inserir(avl, c, NULL);
+            avl = avl_inserir(avl, c, regras);
 
             printf("\nCliente cadastrado com sucesso:\n");
             imprimir_cliente(c);
@@ -154,18 +154,12 @@ int main() {
             printf("ID do Cliente: ");
             scanf("%d", &id);
 
+            avl_realizar_compra(avl, id, valor, mes_atual_sistema, ano_atual_sistema, regras);
             NoAVL* no = avl_buscar(avl, id);
             if (no == NULL) {
                 printf("Cliente nao encontrado.\n");
             } else {
-                printf("Valor da Compra: ");
-                scanf("%f", &valor);
-
-                // Registrar compra no mês atual
-                no->cliente->consumo_mes_atual += valor;
-                no->cliente->visitas_mes_atual++;
-
-                printf("\nCompra registrada:\n");
+                printf("\nCompra registrada e perfil recalculado:\n");
                 imprimir_cliente(no->cliente);
             }
 

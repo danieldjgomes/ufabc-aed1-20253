@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../include/avl.h"
+#include "avl.h"
 
 int max(int a, int b) {
     return (a > b) ? a : b;
@@ -64,6 +64,10 @@ NoAVL* avl_inserir(NoAVL* no, Cliente* c, NoDecisao* regras) {
         novo->esquerda = NULL;
         novo->direita = NULL;
         novo->altura = 0;
+        if (regras != NULL) {
+            // Passamos o mês/ano atual do cliente para a classificação
+            classificar_cliente_mensal(regras, novo->cliente, novo->cliente->mes_atual, novo->cliente->ano_atual);
+        }
         return novo;
     }
 
@@ -135,6 +139,9 @@ NoAVL* avl_realizar_compra(NoAVL* raiz, int id, float valor, int mes, int ano, N
     if (no != NULL) {
         no->cliente->consumo_mes_atual += valor;
         no->cliente->visitas_mes_atual++;
+        if (regras != NULL) {
+            classificar_cliente_mensal(regras, no->cliente, mes, ano);
+        }
     }
     return raiz;
 }

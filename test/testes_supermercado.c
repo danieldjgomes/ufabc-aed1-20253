@@ -5,17 +5,7 @@
 #include "../src/arvore_decisao.h"
 #include "../src/avl.h"
 #include "../src/categoria.h"
-
-// --- Cores e Formatação para Terminal ---
-#define COR_RESET "\033[0m"
-#define COR_VERDE "\033[32m"
-#define COR_VERMELHO "\033[31m"
-#define COR_AMARELO "\033[33m"
-#define COR_AZUL "\033[34m"
-#define COR_MAGENTA "\033[35m"
-#define COR_NEGRITO "\033[1m"
-#define COR_CIANO "\033[36m"
-#define COR_CINZA "\033[90m"
+#include "test_utils.h"
 
 // ============================================================================
 // FUNÇÕES AUXILIARES DE LÓGICA
@@ -60,46 +50,6 @@ Categoria teste_classificar_mensal(NoDecisao *regras, Cliente *c)
 
 	teste_aplicar_regras(regras, c);
 	return c->categoria;
-}
-
-// ============================================================================
-// FUNÇÕES DE HELPERS VISUAIS
-// ============================================================================
-
-void print_banner_principal()
-{
-	printf("\n" COR_AZUL "###########################################################" COR_RESET "\n");
-	printf(COR_AZUL "#" COR_RESET COR_NEGRITO "      SUITE DE TESTES COMPLETOS: SISTEMA MERCADO       " COR_RESET COR_AZUL "#" COR_RESET "\n");
-	printf(COR_AZUL "###########################################################" COR_RESET "\n");
-}
-
-void print_header(const char *titulo)
-{
-	printf("\n" COR_CIANO "-----------------------------------------------------------" COR_RESET "\n");
-	printf(COR_NEGRITO " %s " COR_RESET "\n", titulo);
-	printf(COR_CIANO "-----------------------------------------------------------" COR_RESET "\n");
-}
-
-void print_action(const char *msg)
-{
-	printf("   " COR_AMARELO "-> " COR_RESET "%s\n", msg);
-}
-
-void print_info(const char *msg)
-{
-	printf("      " COR_CINZA "%s" COR_RESET "\n", msg);
-}
-
-void print_check(int passou, const char *msg)
-{
-	if (passou)
-	{
-		printf("   [" COR_VERDE "OK" COR_RESET "] %s\n", msg);
-	}
-	else
-	{
-		printf("   [" COR_VERMELHO "FALHA" COR_RESET "] %s\n", msg);
-	}
 }
 
 // --- Setup das Regras de Negócio (Mock) ---
@@ -372,7 +322,7 @@ void teste_caos()
 
 int main()
 {
-	print_banner_principal();
+	print_banner_principal("SUITE DE TESTES COMPLETOS: SISTEMA MERCADO");
 
 	teste_insercao_simples();
 	teste_classificacao_platina();
@@ -385,9 +335,7 @@ int main()
 	teste_ids_duplicados();
 	teste_caos();
 
-	printf("\n" COR_AZUL "###########################################################" COR_RESET "\n");
-	printf(COR_AZUL "#" COR_RESET COR_NEGRITO "            TODOS OS TESTES FINALIZADOS                 " COR_RESET COR_AZUL "#" COR_RESET "\n");
-	printf(COR_AZUL "###########################################################" COR_RESET "\n");
+	print_footer(1, "TODOS OS TESTES FINALIZADOS", "FALHA NOS TESTES");
 
 	return 0;
 }

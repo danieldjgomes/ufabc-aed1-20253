@@ -11,6 +11,7 @@ MAIN_SRC = src/main.c
 SYS_TEST_SRC = test/testes_supermercado.c
 AVL_TEST_SRC = test/avl.c
 CLIENT_TEST_SRC = test/cliente.c
+TEST_UTILS_SRC = test/test_utils.c
 
 COMMON_SRC = src/avl.c src/arvore_decisao.c src/cliente.c src/categoria.c
 
@@ -23,19 +24,19 @@ app: $(MAIN_SRC) $(COMMON_SRC)
 	$(CC) $(CFLAGS) $(MAIN_SRC) $(COMMON_SRC) -o $(EXEC_APP)
 	@echo "Sucesso! Execute com: ./$(EXEC_APP)"
 
-sys_tests: $(SYS_TEST_SRC) $(COMMON_SRC)
+sys_tests: $(SYS_TEST_SRC) $(COMMON_SRC) $(TEST_UTILS_SRC)
 	@echo "Compilando Suite de Testes do Sistema..."
-	$(CC) $(CFLAGS) $(SYS_TEST_SRC) $(COMMON_SRC) -o $(EXEC_SYS_TESTS)
+	$(CC) $(CFLAGS) $(SYS_TEST_SRC) $(TEST_UTILS_SRC) $(COMMON_SRC) -o $(EXEC_SYS_TESTS)
 	@echo "Sucesso! Execute com: ./$(EXEC_SYS_TESTS)"
 
-avl_tests: $(AVL_TEST_SRC) $(COMMON_SRC)
+avl_tests: $(AVL_TEST_SRC) $(COMMON_SRC) $(TEST_UTILS_SRC)
 	@echo "Compilando Testes da estrutura AVL..."
-	$(CC) $(CFLAGS) $(AVL_TEST_SRC) $(COMMON_SRC) -o $(EXEC_AVL_TESTS)
+	$(CC) $(CFLAGS) $(AVL_TEST_SRC) $(TEST_UTILS_SRC) $(COMMON_SRC) -o $(EXEC_AVL_TESTS)
 	@echo "Sucesso! Execute com: ./$(EXEC_AVL_TESTS)"
 
-client_tests: $(CLIENT_TEST_SRC) $(COMMON_SRC)
+client_tests: $(CLIENT_TEST_SRC) $(COMMON_SRC) $(TEST_UTILS_SRC)
 	@echo "Compilando Testes da estrutura Cliente..."
-	$(CC) $(CFLAGS) $(CLIENT_TEST_SRC) $(COMMON_SRC) -o $(EXEC_CLIENT_TESTS)
+	$(CC) $(CFLAGS) $(CLIENT_TEST_SRC) $(TEST_UTILS_SRC) $(COMMON_SRC) -o $(EXEC_CLIENT_TESTS)
 	@echo "Sucesso! Execute com: ./$(EXEC_CLIENT_TESTS)"
 
 run: app

@@ -234,8 +234,8 @@ int main()
 {
 	int result = 1;
 	result = test_avl_inserir();
-	result = test_avl_structure_after_left_rotation();
 	result = test_avl_structure_after_right_rotation();
+	result = test_avl_structure_after_left_rotation();
 	result = test_avl_structure_after_left_right_rotation();
 	result = test_avl_structure_after_right_left_rotation();
 	if (result == 1)

@@ -151,9 +151,9 @@ static NoAVL *reequilibrar(NoAVL *a)
 	}
 
 	// Caso 2: Desbalanceamento para a esquerda (Rotação Direita)
-	if (fb > -1)
+	if (fb > 1)
 	{
-		if (avl_fator_balanceamento(a->esquerda) > 0)
+		if (avl_fator_balanceamento(a->esquerda) < 0)
 		{
 			a->esquerda = rotacao_esquerda(a->esquerda);
 		}

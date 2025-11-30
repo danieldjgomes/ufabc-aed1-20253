@@ -10,18 +10,18 @@ static int avl_fator_balanceamento(NoAVL *no);
 
 NoAVL *avl_criar()
 {
-	return NULL;
+    return NULL;
 }
 
 void avl_liberar(NoAVL *raiz)
 {
-	if (raiz != NULL)
-	{
-		avl_liberar(raiz->esquerda);
-		avl_liberar(raiz->direita);
-		destruir_cliente(raiz->cliente);
-		free(raiz);
-	}
+    if (raiz != NULL)
+        {
+        avl_liberar(raiz->esquerda);
+        avl_liberar(raiz->direita);
+        destruir_cliente(raiz->cliente);
+        free(raiz);
+    }
 }
 
 void update_height(NoAVL *no)
@@ -68,87 +68,96 @@ NoAVL *rotacao_esquerda(NoAVL *y)
 
 NoAVL *avl_inserir(NoAVL *no, Cliente *c, NoDecisao *regras)
 {
-	if (no == NULL)
-	{
-		NoAVL *novo = (NoAVL *)malloc(sizeof(NoAVL));
-		novo->cliente = c;
-		novo->esquerda = NULL;
-		novo->direita = NULL;
-		novo->altura = 0;
-		return novo;
-	}
+    // O parâmetro 'regras' não estava sendo usado na inserção original,
+    // apenas suprimimos o warning aqui se necessário, ou mantemos como está.
+    (void)regras;
 
-	if (c->id < no->cliente->id)
-		no->esquerda = avl_inserir(no->esquerda, c, regras);
-	else
-		no->direita = avl_inserir(no->direita, c, regras);
+    if (no == NULL)
+    {
+        NoAVL *novo = (NoAVL *)malloc(sizeof(NoAVL));
+        novo->cliente = c;
+        novo->esquerda = NULL;
+        novo->direita = NULL;
+        novo->altura = 0;
+        return novo;
+    }
 
-	return reequilibrar(no);
+    if (c->id < no->cliente->id)
+        no->esquerda = avl_inserir(no->esquerda, c, regras);
+    else
+        no->direita = avl_inserir(no->direita, c, regras);
+
+    return reequilibrar(no);
 }
 
 NoAVL *avl_buscar(NoAVL *raiz, int id)
 {
-	if (raiz == NULL || raiz->cliente->id == id)
-		return raiz;
+    if (raiz == NULL || raiz->cliente->id == id)
+        return raiz;
 
-	if (id < raiz->cliente->id)
-		return avl_buscar(raiz->esquerda, id);
+    if (id < raiz->cliente->id)
+        return avl_buscar(raiz->esquerda, id);
 
-	return avl_buscar(raiz->direita, id);
+    return avl_buscar(raiz->direita, id);
 }
 
 void avl_imprimir_em_ordem(NoAVL *raiz)
 {
-	if (raiz != NULL)
-	{
-		avl_imprimir_em_ordem(raiz->esquerda);
-		imprimir_cliente(raiz->cliente);
-		avl_imprimir_em_ordem(raiz->direita);
-	}
+    if (raiz != NULL)
+    {
+        avl_imprimir_em_ordem(raiz->esquerda);
+        imprimir_cliente(raiz->cliente);
+        avl_imprimir_em_ordem(raiz->direita);
+    }
 }
 
 NoAVL *avl_atualizar_nome(NoAVL *raiz, int id, const char *novo_nome)
 {
-	NoAVL *no = avl_buscar(raiz, id);
-	if (no != NULL)
-	{
-		strncpy(no->cliente->nome, novo_nome, sizeof(no->cliente->nome) - 1);
-		no->cliente->nome[sizeof(no->cliente->nome) - 1] = '\0';
-	}
-	return raiz;
+    NoAVL *no = avl_buscar(raiz, id);
+    if (no != NULL)
+    {
+        strncpy(no->cliente->nome, novo_nome, sizeof(no->cliente->nome) - 1);
+        no->cliente->nome[sizeof(no->cliente->nome) - 1] = '\0';
+    }
+    return raiz;
 }
 
 NoAVL *avl_realizar_compra(NoAVL *raiz, int id, float valor, int mes, int ano, NoDecisao *regras)
 {
-	NoAVL *no = avl_buscar(raiz, id);
-	if (no != NULL)
-	{
-		no->cliente->consumo_mes_atual += valor;
-		no->cliente->visitas_mes_atual++;
-	}
-	return raiz;
+    // Suprime warnings de variáveis não usadas
+    (void)mes;
+    (void)ano;
+    (void)regras;
+
+    NoAVL *no = avl_buscar(raiz, id);
+    if (no != NULL)
+    {
+        no->cliente->consumo_mes_atual += valor;
+        no->cliente->visitas_mes_atual++;
+    }
+    return raiz;
 }
 
 static NoAVL *reequilibrar(NoAVL *a)
 {
-	if (a == NULL)
-	{
-		return NULL;
-	}
+    if (a == NULL)
+    {
+        return NULL;
+    }
 
 	update_height(a);
 
-	int fb = avl_fator_balanceamento(a);
+    int fb = avl_fator_balanceamento(a);
 
-	// Caso 1: Desbalanceamento para a direita (Rotação Esquerda)
-	if (fb < -1)
-	{
-		if (avl_fator_balanceamento(a->direita) > 0)
-		{
-			a->direita = rotacao_direita(a->direita);
-		}
-		return rotacao_esquerda(a);
-	}
+    // Caso 1: Desbalanceamento para a direita (Rotação Esquerda)
+    if (fb < -1)
+    {
+        if (avl_fator_balanceamento(a->direita) > 0)
+        {
+            a->direita = rotacao_direita(a->direita);
+        }
+        return rotacao_esquerda(a);
+    }
 
 	// Caso 2: Desbalanceamento para a esquerda (Rotação Direita)
 	if (fb > 1)

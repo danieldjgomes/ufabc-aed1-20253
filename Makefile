@@ -13,7 +13,7 @@ AVL_TEST_SRC = test/avl.c
 CLIENT_TEST_SRC = test/cliente.c
 TEST_UTILS_SRC = test/test_utils.c
 
-COMMON_SRC = src/avl.c src/arvore_decisao.c src/cliente.c src/categoria.c
+COMMON_SRC = src/avl.c src/arvore_decisao.c src/cliente.c src/categoria.c src/supermercado.c
 
 # --- Regras Principais ---
 

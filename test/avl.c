@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "../src/avl.h"
 #include "../src/cliente.h"
@@ -38,6 +39,44 @@ int test_avl_inserir()
 	print_check(busca_ok, "Todos os clientes foram encontrados na AVL");
 
 	return busca_ok;
+}
+
+int test_avl_atualizar_nome()
+{
+	print_header("Testando atualização de nome na AVL");
+
+	print_action("Criando cliente 'Nome Antigo' (ID 100)...");
+	Cliente *c = criar_cliente_with_id("Nome Antigo", 100);
+
+	print_action("Inserindo cliente na árvore...");
+	NoAVL *r = avl_criar();
+	r = avl_inserir(r, c, NULL);
+
+	print_action("Atualizando nome para 'Nome Novo'...");
+	avl_atualizar_nome(r, 100, "Nome Novo");
+
+	print_action("Buscando cliente para verificar atualização...");
+	NoAVL *no = avl_buscar(r, 100);
+
+	int result = 0;
+	if (no != NULL && no->cliente != NULL)
+	{
+		if (strcmp(no->cliente->nome, "Nome Novo") == 0)
+		{
+			result = 1;
+		}
+		else
+		{
+			printf("      Esperado: 'Nome Novo' | Recebido: '%s'\n", no->cliente->nome);
+		}
+	}
+	else
+	{
+		printf("      Cliente não encontrado na árvore.\n");
+	}
+
+	print_check(result, "Nome do cliente atualizado corretamente");
+	return result;
 }
 
 int test_avl_structure_after_right_rotation()
@@ -178,6 +217,7 @@ int main()
 
 	int result = 1;
 	if (!test_avl_inserir()) result = 0;
+	if (!test_avl_atualizar_nome()) result = 0;
 	if (!test_avl_structure_after_right_rotation()) result = 0;
 	if (!test_avl_structure_after_left_rotation()) result = 0;
 	if (!test_avl_structure_after_left_right_rotation()) result = 0;

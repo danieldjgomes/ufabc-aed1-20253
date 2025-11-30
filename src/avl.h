@@ -14,6 +14,8 @@ struct NoAVL
 	struct NoAVL *direita;
 };
 
+void update_height(NoAVL *no);
+
 NoAVL *avl_criar();
 
 void avl_liberar(NoAVL *raiz);

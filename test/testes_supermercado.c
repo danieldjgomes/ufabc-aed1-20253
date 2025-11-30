@@ -5,146 +5,8 @@
 #include "../src/arvore_decisao.h"
 #include "../src/avl.h"
 #include "../src/categoria.h"
-
-// --- Cores e Formatação para Terminal ---
-#define COR_RESET "\033[0m"
-#define COR_VERDE "\033[32m"
-#define COR_VERMELHO "\033[31m"
-#define COR_AMARELO "\033[33m"
-#define COR_AZUL "\033[34m"
-#define COR_MAGENTA "\033[35m"
-#define COR_NEGRITO "\033[1m"
-#define COR_CIANO "\033[36m"
-#define COR_CINZA "\033[90m"
-
-// ============================================================================
-// FUNÇÕES AUXILIARES DE LÓGICA
-// ============================================================================
-// (conflito de main), replicamos a lógica aqui para testá-la isoladamente.
-
-void teste_aplicar_regras(NoDecisao *d, Cliente *c)
-{
-	if (d == NULL)
-		return;
-
-	if (d->tipo == TIPO_CATEGORIA)
-	{
-		c->categoria = d->categoria;
-		return;
-	}
-
-	int condicao = 0;
-	if (d->tipo == TIPO_VISITAS_MES_ANTERIOR)
-	{
-		condicao = (c->visitas_mes_anterior < d->valor_corte);
-	}
-	else if (d->tipo == TIPO_CONSUMO_MES_ANTERIOR)
-	{
-		condicao = (c->consumo_mes_anterior < d->valor_corte);
-	}
-
-	if (condicao)
-	{
-		teste_aplicar_regras(d->esquerda, c);
-	}
-	else
-	{
-		teste_aplicar_regras(d->direita, c);
-	}
-}
-
-Categoria teste_classificar_mensal(NoDecisao *regras, Cliente *c)
-{
-	if (regras == NULL || c == NULL)
-		return STANDARD;
-
-	teste_aplicar_regras(regras, c);
-	return c->categoria;
-}
-
-// ============================================================================
-// FUNÇÕES DE HELPERS VISUAIS
-// ============================================================================
-
-void print_banner_principal()
-{
-	printf("\n" COR_AZUL "###########################################################" COR_RESET "\n");
-	printf(COR_AZUL "#" COR_RESET COR_NEGRITO "      SUITE DE TESTES COMPLETOS: SISTEMA MERCADO       " COR_RESET COR_AZUL "#" COR_RESET "\n");
-	printf(COR_AZUL "###########################################################" COR_RESET "\n");
-}
-
-void print_header(const char *titulo)
-{
-	printf("\n" COR_CIANO "-----------------------------------------------------------" COR_RESET "\n");
-	printf(COR_NEGRITO " %s " COR_RESET "\n", titulo);
-	printf(COR_CIANO "-----------------------------------------------------------" COR_RESET "\n");
-}
-
-void print_action(const char *msg)
-{
-	printf("   " COR_AMARELO "-> " COR_RESET "%s\n", msg);
-}
-
-void print_info(const char *msg)
-{
-	printf("      " COR_CINZA "%s" COR_RESET "\n", msg);
-}
-
-void print_check(int passou, const char *msg)
-{
-	if (passou)
-	{
-		printf("   [" COR_VERDE "OK" COR_RESET "] %s\n", msg);
-	}
-	else
-	{
-		printf("   [" COR_VERMELHO "FALHA" COR_RESET "] %s\n", msg);
-	}
-}
-
-// --- Setup das Regras de Negócio (Mock) ---
-NoDecisao *setup_regras()
-{
-	// Adaptado para usar ENUMs definidos em categoria.h
-	NoDecisao *f_platina = criar_folha_categoria(PLATINUM);
-	NoDecisao *f_ouro = criar_folha_categoria(GOLD);
-	NoDecisao *f_prata = criar_folha_categoria(SILVER);
-	NoDecisao *f_bronze = criar_folha_categoria(BRONZE);
-
-	NoDecisao *consumo_alto = criar_no_decisao(TIPO_CONSUMO_MES_ANTERIOR, 200.0, f_ouro, f_platina);
-	NoDecisao *consumo_baixo = criar_no_decisao(TIPO_CONSUMO_MES_ANTERIOR, 100.0, f_bronze, f_prata);
-	NoDecisao *raiz = criar_no_decisao(TIPO_VISITAS_MES_ANTERIOR, 2.0, consumo_baixo, consumo_alto);
-
-	return raiz;
-}
-
-// --- Simulador de Tempo (Virada de Mês) ---
-void auxiliar_avancar_mes_todos(NoAVL *raiz, NoDecisao *regras)
-{
-	if (raiz != NULL)
-	{
-		auxiliar_avancar_mes_todos(raiz->esquerda, regras);
-
-		// printf("      [SISTEMA] Processando virada de mês para ID %d (%s)...\n", raiz->cliente->id, raiz->cliente->nome);
-
-		raiz->cliente->consumo_mes_anterior = raiz->cliente->consumo_mes_atual;
-		raiz->cliente->visitas_mes_anterior = raiz->cliente->visitas_mes_atual;
-		raiz->cliente->consumo_mes_atual = 0.0;
-		raiz->cliente->visitas_mes_atual = 0;
-
-		raiz->cliente->mes_atual++;
-		if (raiz->cliente->mes_atual > 12)
-		{
-			raiz->cliente->mes_atual = 1;
-			raiz->cliente->ano_atual++;
-		}
-
-		// Usamos a função local de teste, pois a original está presa no main.c
-		teste_classificar_mensal(regras, raiz->cliente);
-
-		auxiliar_avancar_mes_todos(raiz->direita, regras);
-	}
-}
+#include "../src/supermercado.h"
+#include "test_utils.h"
 
 // ============================================================================
 // PARTE 1: TESTES FUNCIONAIS BÁSICOS
@@ -154,7 +16,7 @@ void teste_insercao_simples()
 {
 	print_header("TESTE 1: Inserção e Classificação Inicial");
 	NoAVL *avl = avl_criar();
-	NoDecisao *regras = setup_regras();
+	NoDecisao *regras = construir_arvore_decisao_supermercado();
 
 	print_action("Criando objeto cliente 'Thiago Dias'...");
 	Cliente *c = criar_cliente("Thiago Dias");
@@ -179,7 +41,7 @@ void teste_classificacao_platina()
 {
 	print_header("TESTE 2: Evolução para PLATINA");
 	NoAVL *avl = avl_criar();
-	NoDecisao *regras = setup_regras();
+	NoDecisao *regras = construir_arvore_decisao_supermercado();
 
 	print_action("Inserindo 'Lucas Marin'...");
 	Cliente *c = criar_cliente("Lucas Marin");
@@ -194,7 +56,7 @@ void teste_classificacao_platina()
 	print_info("Status Atual: Gasto R$ 250.00 | Visitas: 2");
 
 	print_action("Virando o mês (acionando classificação)...");
-	auxiliar_avancar_mes_todos(avl, regras);
+	avancar_mes_todos_clientes(avl, regras);
 
 	int sucesso = (c->categoria == PLATINUM);
 	print_check(sucesso, "Cliente virou Platina corretamente");
@@ -209,7 +71,7 @@ void teste_rebaixamento()
 {
 	print_header("TESTE 3: Rebaixamento de Categoria");
 	NoAVL *avl = avl_criar();
-	NoDecisao *regras = setup_regras();
+	NoDecisao *regras = construir_arvore_decisao_supermercado();
 
 	print_action("Inserindo 'Pedro DeGan'...");
 	Cliente *c = criar_cliente("Pedro DeGan");
@@ -218,14 +80,14 @@ void teste_rebaixamento()
 	print_action("Mês 1: Forçando status Platina (Gasto 300, 2 Visitas)...");
 	avl_realizar_compra(avl, c->id, 300.0, 11, 2025, regras);
 	avl_realizar_compra(avl, c->id, 10.0, 11, 2025, regras);
-	auxiliar_avancar_mes_todos(avl, regras);
+	avancar_mes_todos_clientes(avl, regras);
 	print_info("Cliente agora deve ser Platina.");
 
 	print_action("Mês 2: Cliente gasta R$ 1000.00 mas visita APENAS 1 vez...");
 	avl_realizar_compra(avl, c->id, 1000.0, 12, 2025, regras);
 
 	print_action("Virando o mês para recalcular...");
-	auxiliar_avancar_mes_todos(avl, regras);
+	avancar_mes_todos_clientes(avl, regras);
 
 	// Na sua árvore: Visitas < 2 -> Consumo >= 100 -> SILVER (Prata)
 	int sucesso = (c->categoria == SILVER);
@@ -245,7 +107,7 @@ void teste_reembolso()
 {
 	print_header("TESTE 4: Estorno e Valores Negativos");
 	NoAVL *avl = avl_criar();
-	NoDecisao *regras = setup_regras();
+	NoDecisao *regras = construir_arvore_decisao_supermercado();
 
 	print_action("Inserindo 'Lucas Reis'...");
 	Cliente *c = criar_cliente("Lucas Reis");
@@ -262,7 +124,7 @@ void teste_reembolso()
 
 	print_info("Saldo Líquido Esperado: R$ 110.00");
 
-	auxiliar_avancar_mes_todos(avl, regras);
+	avancar_mes_todos_clientes(avl, regras);
 
 	// Visitas >= 2, Gasto 110 ( < 200). Deve ser GOLD (Ouro)
 	int sucesso = (c->categoria == GOLD);
@@ -278,7 +140,7 @@ void teste_precisao_float()
 {
 	print_header("TESTE 5: Limite de Precisão (199.99 vs 200.00)");
 	NoAVL *avl = avl_criar();
-	NoDecisao *regras = setup_regras();
+	NoDecisao *regras = construir_arvore_decisao_supermercado();
 
 	print_action("Inserindo 'Daniel Gomes'...");
 	Cliente *c = criar_cliente("Daniel Gomes");
@@ -291,7 +153,7 @@ void teste_precisao_float()
 	avl_realizar_compra(avl, c->id, 0.0, 11, 2025, regras);
 
 	print_action("Verificando se sistema arredonda errado...");
-	auxiliar_avancar_mes_todos(avl, regras);
+	avancar_mes_todos_clientes(avl, regras);
 
 	// Visitas >= 2. Gasto 199.99 (< 200). Deve ser GOLD, NÃO PLATINUM.
 	int sucesso = (c->categoria != PLATINUM);
@@ -306,7 +168,7 @@ void teste_ids_duplicados()
 {
 	print_header("TESTE 6: Integridade: IDs Duplicados");
 	NoAVL *avl = avl_criar();
-	NoDecisao *regras = setup_regras();
+	NoDecisao *regras = construir_arvore_decisao_supermercado();
 
 	print_action("Criando cliente 'Dona Maria 1' (ID X)...");
 	Cliente *c1 = criar_cliente("Dona Maria 1");
@@ -338,7 +200,7 @@ void teste_caos()
 {
 	print_header("TESTE 7: Teste de Valores Extremos");
 	NoAVL *avl = avl_criar();
-	NoDecisao *regras = setup_regras();
+	NoDecisao *regras = construir_arvore_decisao_supermercado();
 
 	print_action("Inserindo 'Algoritmo e Estrutura de Dados I'...");
 	Cliente *c = criar_cliente("Algoritmo e Estrutura de Dados I");
@@ -358,7 +220,7 @@ void teste_caos()
 	// Forçar visitas para garantir Platina se saldo estiver ok
 	c->visitas_mes_atual = 2;
 
-	auxiliar_avancar_mes_todos(avl, regras);
+	avancar_mes_todos_clientes(avl, regras);
 
 	// Gasto 250, Visitas 2 -> Platina
 	int sucesso = (c->categoria == PLATINUM && c->consumo_mes_anterior == 250.0);
@@ -370,9 +232,75 @@ void teste_caos()
 	liberar_arvore_decisao(regras);
 }
 
+void teste_virada_de_ano()
+{
+	print_header("TESTE 8: Virada de Ano (Dezembro -> Janeiro)");
+	NoAVL *avl = avl_criar();
+	NoDecisao *regras = construir_arvore_decisao_supermercado();
+
+	print_action("Inserindo 'Cliente Ano Novo'...");
+	Cliente *c = criar_cliente("Cliente Ano Novo");
+	
+	// Configurar data para Dezembro de 2025
+	c->mes_atual = 12;
+	c->ano_atual = 2025;
+	
+	avl = avl_inserir(avl, c, regras);
+
+	print_info("Data Atual: 12/2025");
+	print_action("Processando virada de mês...");
+	
+	avancar_mes_todos_clientes(avl, regras);
+
+	int sucesso = (c->mes_atual == 1 && c->ano_atual == 2026);
+	print_check(sucesso, "Cliente avançou corretamente para Janeiro de 2026");
+	
+	if (!sucesso) {
+		printf("      Recebido: %d/%d\n", c->mes_atual, c->ano_atual);
+	}
+
+	avl_liberar(avl);
+	liberar_arvore_decisao(regras);
+}
+
+void teste_zerar_acumuladores()
+{
+	print_header("TESTE 9: Limpeza de Acumuladores Mensais");
+	NoAVL *avl = avl_criar();
+	NoDecisao *regras = construir_arvore_decisao_supermercado();
+
+	print_action("Inserindo 'Cliente Teste'...");
+	Cliente *c = criar_cliente("Cliente Teste");
+	avl = avl_inserir(avl, c, regras);
+
+	// Mês 1: Compra e visita
+	avl_realizar_compra(avl, c->id, 500.0, c->mes_atual, c->ano_atual, regras);
+	print_info("Mês 1: Gasto 500.00");
+
+	avancar_mes_todos_clientes(avl, regras);
+	
+	int check1 = (c->consumo_mes_anterior == 500.0 && c->consumo_mes_atual == 0.0);
+	print_check(check1, "Virada Mês 1 -> Mês 2: Consumo anterior 500, Atual zerado");
+
+	// Mês 2: NENHUMA compra
+	print_info("Mês 2: Nenhuma compra realizada");
+	
+	avancar_mes_todos_clientes(avl, regras);
+	
+	int check2 = (c->consumo_mes_anterior == 0.0);
+	print_check(check2, "Virada Mês 2 -> Mês 3: Consumo anterior foi corretamente zerado (não reteve 500)");
+	
+	if (!check2) {
+		printf("      Consumo anterior incorreto: %.2f\n", c->consumo_mes_anterior);
+	}
+
+	avl_liberar(avl);
+	liberar_arvore_decisao(regras);
+}
+
 int main()
 {
-	print_banner_principal();
+	print_banner_principal("SUITE DE TESTES COMPLETOS: SISTEMA MERCADO");
 
 	teste_insercao_simples();
 	teste_classificacao_platina();
@@ -384,10 +312,13 @@ int main()
 	teste_precisao_float();
 	teste_ids_duplicados();
 	teste_caos();
+	
+	printf("\n");
+	
+	teste_virada_de_ano();
+	teste_zerar_acumuladores();
 
-	printf("\n" COR_AZUL "###########################################################" COR_RESET "\n");
-	printf(COR_AZUL "#" COR_RESET COR_NEGRITO "            TODOS OS TESTES FINALIZADOS                 " COR_RESET COR_AZUL "#" COR_RESET "\n");
-	printf(COR_AZUL "###########################################################" COR_RESET "\n");
+	print_footer(1, "TODOS OS TESTES FINALIZADOS", "FALHA NOS TESTES");
 
 	return 0;
 }

@@ -68,8 +68,6 @@ NoAVL *rotacao_esquerda(NoAVL *y)
 
 NoAVL *avl_inserir(NoAVL *no, Cliente *c, NoDecisao *regras)
 {
-    // O parâmetro 'regras' não estava sendo usado na inserção original,
-    // apenas suprimimos o warning aqui se necessário, ou mantemos como está.
     (void)regras;
 
     if (no == NULL)
@@ -124,7 +122,6 @@ NoAVL *avl_atualizar_nome(NoAVL *raiz, int id, const char *novo_nome)
 
 NoAVL *avl_realizar_compra(NoAVL *raiz, int id, float valor, int mes, int ano, NoDecisao *regras)
 {
-    // Suprime warnings de variáveis não usadas
     (void)mes;
     (void)ano;
     (void)regras;

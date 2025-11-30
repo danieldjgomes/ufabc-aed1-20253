@@ -25,7 +25,6 @@ NoDecisao *criar_folha_categoria(Categoria);
 
 void liberar_arvore_decisao(NoDecisao *raiz);
 
-// Helper to get min consumption for a category
 float get_consumo_minimo_categoria(Categoria);
 
 #endif

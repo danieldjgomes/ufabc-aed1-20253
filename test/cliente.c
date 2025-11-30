@@ -3,39 +3,41 @@
 #include <string.h>
 
 #include "../src/cliente.h"
+#include "test_utils.h"
 
-	int test_create_clients()
+int test_create_clients()
 {
-	printf("Testando criação de clientes...\n");
+	print_header("Testando criação de clientes");
+
+	print_action("Criando clientes A e B...");
 	Cliente *c1 = criar_cliente("A");
 	Cliente *c2 = criar_cliente("B");
-	if (c1 == NULL || strcmp(c1->nome, "A") != 0 || c1->id != 1)
-	{
-		return 0;
-	}
-	if (c2 == NULL || strcmp(c2->nome, "B") != 0 || c2->id != 2)
-	{
-		return 0;
-	}
-	free(c1);
-	free(c2);
-	return 1;
+
+	int result = 1;
+	
+	int c1_ok = (c1 != NULL && strcmp(c1->nome, "A") == 0 && c1->id == 1);
+	print_check(c1_ok, "Cliente A criado corretamente (ID 1)");
+	if (!c1_ok) result = 0;
+
+	int c2_ok = (c2 != NULL && strcmp(c2->nome, "B") == 0 && c2->id == 2);
+	print_check(c2_ok, "Cliente B criado corretamente (ID 2)");
+	if (!c2_ok) result = 0;
+
+	// Usa a função correta para liberar a memória do cliente
+	destruir_cliente(c1);
+	destruir_cliente(c2);
+	
+	return result;
 }
 
 int main(void)
 {
-	int passed = 1;
+	print_banner_principal("SUITE DE TESTES COMPLETOS: ESTRUTURA CLIENTE");
 
+	int passed = 1;
 	passed &= test_create_clients();
 
-	if (passed)
-	{
-		printf("Todos os testes passaram!\n");
-		return 0;
-	}
-	else
-	{
-		printf("Alguns testes falharam.\n");
-		return 1;
-	}
+	print_footer(passed, "TODOS OS TESTES CLIENTE PASSARAM", "ALGUNS TESTES CLIENTE FALHARAM");
+
+	return !passed;
 }

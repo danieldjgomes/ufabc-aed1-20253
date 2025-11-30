@@ -3,24 +3,10 @@
 #include <string.h>
 #include "avl.h"
 
-int max(int a, int b)
-{
-	return (a > b) ? a : b;
-}
-
-int avl_altura(NoAVL *no)
-{
-	if (no == NULL)
-		return -1;
-	return no->altura;
-}
-
-int avl_fator_balanceamento(NoAVL *no)
-{
-	if (no == NULL)
-		return 0;
-	return avl_altura(no->esquerda) - avl_altura(no->direita);
-}
+static NoAVL *reequilibrar(NoAVL *);
+static int max(int, int);
+static int avl_altura(NoAVL *no);
+static int avl_fator_balanceamento(NoAVL *no);
 
 NoAVL *avl_criar()
 {
@@ -38,32 +24,46 @@ void avl_liberar(NoAVL *raiz)
 	}
 }
 
-NoAVL *rotacao_direita(NoAVL *y)
+void update_height(NoAVL *no)
 {
-	NoAVL *x = y->esquerda;
-	NoAVL *T2 = x->direita;
-
-	x->direita = y;
-	y->esquerda = T2;
-
-	y->altura = max(avl_altura(y->esquerda), avl_altura(y->direita)) + 1;
-	x->altura = max(avl_altura(x->esquerda), avl_altura(x->direita)) + 1;
-
-	return x;
+	if (no != NULL)
+	{
+		no->altura = 1 + max(avl_altura(no->esquerda), avl_altura(no->direita));
+	}
 }
 
-NoAVL *rotacao_esquerda(NoAVL *x)
+NoAVL *rotacao_direita(NoAVL *y)
 {
-	NoAVL *y = x->direita;
-	NoAVL *T2 = y->esquerda;
+	if (y == NULL)
+	{
+		return NULL;
+	}
 
-	y->esquerda = x;
-	x->direita = T2;
+	NoAVL *pivo = y->esquerda;
+	y->esquerda = pivo->direita;
+	pivo->direita = y;
 
-	x->altura = max(avl_altura(x->esquerda), avl_altura(x->direita)) + 1;
-	y->altura = max(avl_altura(y->esquerda), avl_altura(y->direita)) + 1;
+	update_height(y);
+	update_height(pivo);
 
-	return y;
+	return pivo;
+}
+
+NoAVL *rotacao_esquerda(NoAVL *y)
+{
+	if (y == NULL)
+	{
+		return NULL;
+	}
+
+	NoAVL *pivo = y->direita;
+	y->direita = pivo->esquerda;
+	pivo->esquerda = y;
+
+	update_height(y);
+	update_height(pivo);
+
+	return pivo;
 }
 
 NoAVL *avl_inserir(NoAVL *no, Cliente *c, NoDecisao *regras)
@@ -129,14 +129,14 @@ NoAVL *avl_realizar_compra(NoAVL *raiz, int id, float valor, int mes, int ano, N
 	return raiz;
 }
 
-NoAVL *reequilibrar(NoAVL *a)
+static NoAVL *reequilibrar(NoAVL *a)
 {
 	if (a == NULL)
 	{
 		return NULL;
 	}
 
-	a->altura = 1 + max(avl_altura(a->esquerda), avl_altura(a->direita));
+	update_height(a);
 
 	int fb = avl_fator_balanceamento(a);
 
@@ -162,4 +162,23 @@ NoAVL *reequilibrar(NoAVL *a)
 
 	// Caso 3: Nenhum desbalanceamento (Sem rotação)
 	return a;
+}
+
+static int max(int a, int b)
+{
+	return (a > b) ? a : b;
+}
+
+static int avl_altura(NoAVL *no)
+{
+	if (no == NULL)
+		return -1;
+	return no->altura;
+}
+
+static int avl_fator_balanceamento(NoAVL *no)
+{
+	if (no == NULL)
+		return 0;
+	return avl_altura(no->esquerda) - avl_altura(no->direita);
 }

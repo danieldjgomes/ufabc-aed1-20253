@@ -23,8 +23,10 @@ int test_create_clients()
 	print_check(c2_ok, "Cliente B criado corretamente (ID 2)");
 	if (!c2_ok) result = 0;
 
-	free(c1);
-	free(c2);
+	// Usa a função correta para liberar a memória do cliente
+	destruir_cliente(c1);
+	destruir_cliente(c2);
+	
 	return result;
 }
 

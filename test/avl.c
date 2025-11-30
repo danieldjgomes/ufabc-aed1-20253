@@ -24,7 +24,11 @@ int test_avl_inserir()
 
 	int criacao_ok = (r != NULL && r->cliente != NULL);
 	print_check(criacao_ok, "Estrutura da árvore AVL criada com sucesso");
-	if (!criacao_ok) return 0;
+	
+	if (!criacao_ok) {
+		avl_liberar(r); // Libera mesmo em caso de erro parcial (se r não for null)
+		return 0;
+	}
 
 	print_action("Buscando clientes inseridos...");
 	NoAVL *no_c1 = avl_buscar(r, c1->id);
@@ -38,6 +42,7 @@ int test_avl_inserir()
 
 	print_check(busca_ok, "Todos os clientes foram encontrados na AVL");
 
+	avl_liberar(r);
 	return busca_ok;
 }
 
@@ -76,6 +81,8 @@ int test_avl_atualizar_nome()
 	}
 
 	print_check(result, "Nome do cliente atualizado corretamente");
+	
+	avl_liberar(r);
 	return result;
 }
 
@@ -93,6 +100,9 @@ int test_avl_busca_vazia()
 	print_check(ok, "Busca em árvore vazia retornou NULL (Segurança)");
 	
 	if (!ok) printf("      Falha: Retornou ponteiro não nulo ou crashou.\n");
+	
+	// avl_liberar(r) não é necessário aqui pois r é NULL, mas é seguro chamar
+	avl_liberar(r);
 	
 	return ok;
 }
@@ -127,6 +137,7 @@ int test_avl_structure_after_right_rotation()
 
 	print_check(result, "Estrutura correta após rotação direita");
 
+	avl_liberar(r);
 	return result;
 }
 
@@ -160,6 +171,7 @@ int test_avl_structure_after_left_rotation()
 
 	print_check(result, "Estrutura correta após rotação esquerda");
 
+	avl_liberar(r);
 	return result;
 }
 
@@ -193,6 +205,7 @@ int test_avl_structure_after_left_right_rotation()
 
 	print_check(result, "Estrutura correta após rotação esquerda-direita");
 
+	avl_liberar(r);
 	return result;
 }
 
@@ -226,6 +239,7 @@ int test_avl_structure_after_right_left_rotation()
 
 	print_check(result, "Estrutura correta após rotação direita-esquerda");
 
+	avl_liberar(r);
 	return result;
 }
 

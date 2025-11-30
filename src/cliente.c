@@ -25,6 +25,25 @@ Cliente *criar_cliente(const char *nome)
 	return c;
 }
 
+Cliente *criar_cliente_with_id(const char *nome, int id)
+{
+	Cliente *c = (Cliente *)malloc(sizeof(Cliente));
+	if (c != NULL)
+	{
+		c->id = id;
+		strncpy(c->nome, nome, sizeof(c->nome) - 1);
+		c->nome[sizeof(c->nome) - 1] = '\0';
+		c->categoria = STANDARD;
+		c->mes_atual = 11;
+		c->ano_atual = 2025;
+		c->consumo_mes_atual = 0.0;
+		c->visitas_mes_atual = 0;
+		c->consumo_mes_anterior = 0.0;
+		c->visitas_mes_anterior = 0;
+	}
+	return c;
+}
+
 void destruir_cliente(Cliente *c)
 {
 	if (c != NULL)

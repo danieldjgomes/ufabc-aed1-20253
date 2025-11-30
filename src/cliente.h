@@ -20,6 +20,8 @@ struct cliente
 
 Cliente *criar_cliente(const char *nome);
 
+Cliente *criar_cliente_with_id(const char *nome, int id);
+
 void destruir_cliente(Cliente *c);
 
 void imprimir_cliente(Cliente *c);

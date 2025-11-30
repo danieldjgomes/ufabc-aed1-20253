@@ -79,6 +79,24 @@ int test_avl_atualizar_nome()
 	return result;
 }
 
+int test_avl_busca_vazia()
+{
+	print_header("Testando busca em árvore vazia");
+
+	print_action("Criando árvore vazia...");
+	NoAVL *r = avl_criar(); // Retorna NULL
+
+	print_action("Tentando buscar ID 1...");
+	NoAVL *res = avl_buscar(r, 1);
+
+	int ok = (res == NULL);
+	print_check(ok, "Busca em árvore vazia retornou NULL (Segurança)");
+	
+	if (!ok) printf("      Falha: Retornou ponteiro não nulo ou crashou.\n");
+	
+	return ok;
+}
+
 int test_avl_structure_after_right_rotation()
 {
 	print_header("Testando estrutura AVL após rotação direita");
@@ -218,6 +236,7 @@ int main()
 	int result = 1;
 	if (!test_avl_inserir()) result = 0;
 	if (!test_avl_atualizar_nome()) result = 0;
+	if (!test_avl_busca_vazia()) result = 0;
 	if (!test_avl_structure_after_right_rotation()) result = 0;
 	if (!test_avl_structure_after_left_rotation()) result = 0;
 	if (!test_avl_structure_after_left_right_rotation()) result = 0;

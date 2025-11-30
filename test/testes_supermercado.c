@@ -232,6 +232,72 @@ void teste_caos()
 	liberar_arvore_decisao(regras);
 }
 
+void teste_virada_de_ano()
+{
+	print_header("TESTE 8: Virada de Ano (Dezembro -> Janeiro)");
+	NoAVL *avl = avl_criar();
+	NoDecisao *regras = construir_arvore_decisao_supermercado();
+
+	print_action("Inserindo 'Cliente Ano Novo'...");
+	Cliente *c = criar_cliente("Cliente Ano Novo");
+	
+	// Configurar data para Dezembro de 2025
+	c->mes_atual = 12;
+	c->ano_atual = 2025;
+	
+	avl = avl_inserir(avl, c, regras);
+
+	print_info("Data Atual: 12/2025");
+	print_action("Processando virada de mês...");
+	
+	avancar_mes_todos_clientes(avl, regras);
+
+	int sucesso = (c->mes_atual == 1 && c->ano_atual == 2026);
+	print_check(sucesso, "Cliente avançou corretamente para Janeiro de 2026");
+	
+	if (!sucesso) {
+		printf("      Recebido: %d/%d\n", c->mes_atual, c->ano_atual);
+	}
+
+	avl_liberar(avl);
+	liberar_arvore_decisao(regras);
+}
+
+void teste_zerar_acumuladores()
+{
+	print_header("TESTE 9: Limpeza de Acumuladores Mensais");
+	NoAVL *avl = avl_criar();
+	NoDecisao *regras = construir_arvore_decisao_supermercado();
+
+	print_action("Inserindo 'Cliente Teste'...");
+	Cliente *c = criar_cliente("Cliente Teste");
+	avl = avl_inserir(avl, c, regras);
+
+	// Mês 1: Compra e visita
+	avl_realizar_compra(avl, c->id, 500.0, c->mes_atual, c->ano_atual, regras);
+	print_info("Mês 1: Gasto 500.00");
+
+	avancar_mes_todos_clientes(avl, regras);
+	
+	int check1 = (c->consumo_mes_anterior == 500.0 && c->consumo_mes_atual == 0.0);
+	print_check(check1, "Virada Mês 1 -> Mês 2: Consumo anterior 500, Atual zerado");
+
+	// Mês 2: NENHUMA compra
+	print_info("Mês 2: Nenhuma compra realizada");
+	
+	avancar_mes_todos_clientes(avl, regras);
+	
+	int check2 = (c->consumo_mes_anterior == 0.0);
+	print_check(check2, "Virada Mês 2 -> Mês 3: Consumo anterior foi corretamente zerado (não reteve 500)");
+	
+	if (!check2) {
+		printf("      Consumo anterior incorreto: %.2f\n", c->consumo_mes_anterior);
+	}
+
+	avl_liberar(avl);
+	liberar_arvore_decisao(regras);
+}
+
 int main()
 {
 	print_banner_principal("SUITE DE TESTES COMPLETOS: SISTEMA MERCADO");
@@ -246,6 +312,11 @@ int main()
 	teste_precisao_float();
 	teste_ids_duplicados();
 	teste_caos();
+	
+	printf("\n");
+	
+	teste_virada_de_ano();
+	teste_zerar_acumuladores();
 
 	print_footer(1, "TODOS OS TESTES FINALIZADOS", "FALHA NOS TESTES");
 

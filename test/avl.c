@@ -98,17 +98,29 @@ int test_avl_structure_after_left_rotation()
 
 	int result = 1;
 	if (r->cliente->id != 20)
+	{
 		result = 0;
+	}
 	if (r->esquerda->cliente->id != 10)
+	{
 		result = 0;
+	}
 	if (r->esquerda->esquerda->cliente->id != 5)
+	{
 		result = 0;
+	}
 	if (r->esquerda->direita->cliente->id != 15)
+	{
 		result = 0;
+	}
 	if (r->direita->cliente->id != 25)
+	{
 		result = 0;
+	}
 	if (r->direita->direita->cliente->id != 30)
+	{
 		result = 0;
+	}
 	if (result == 0)
 	{
 		printf("%s falhou\n", __func__);
@@ -134,56 +146,30 @@ int test_avl_structure_after_left_right_rotation()
 	r = avl_inserir(r, c5, NULL);
 	r = avl_inserir(r, c6, NULL);
 
-	printf("%s - Árvore AVL construída.\n", __func__);
-
 	int result = 1;
 	if (r->cliente->id != 13)
 	{
 		result = 0;
 	}
-	else
-	{
-		printf("%s - Nó 13 está OK.\n", __func__);
-	}
 	if (r->esquerda->cliente->id != 10)
 	{
 		result = 0;
-	}
-	else
-	{
-		printf("%s - Nó 10 está OK.\n", __func__);
 	}
 	if (r->esquerda->esquerda->cliente->id != 5)
 	{
 		result = 0;
 	}
-	else
-	{
-		printf("%s - Nó 5 está OK.\n", __func__);
-	}
 	if (r->esquerda->direita->cliente->id != 12)
 	{
 		result = 0;
-	}
-	else
-	{
-		printf("%s - Nó 12 está OK.\n", __func__);
 	}
 	if (r->direita->cliente->id != 15)
 	{
 		result = 0;
 	}
-	else
-	{
-		printf("%s - Nó 15 está OK.\n", __func__);
-	}
 	if (r->direita->direita->cliente->id != 20)
 	{
 		result = 0;
-	}
-	else
-	{
-		printf("%s - Nó 20 está OK.\n", __func__);
 	}
 	if (result == 0)
 	{
@@ -212,17 +198,29 @@ int test_avl_structure_after_right_left_rotation()
 
 	int result = 1;
 	if (r->cliente->id != 25)
+	{
 		result = 0;
+	}
 	if (r->esquerda->cliente->id != 15)
+	{
 		result = 0;
+	}
 	if (r->esquerda->esquerda->cliente->id != 10)
+	{
 		result = 0;
+	}
 	if (r->direita->cliente->id != 30)
+	{
 		result = 0;
+	}
 	if (r->direita->direita->cliente->id != 40)
+	{
 		result = 0;
+	}
 	if (r->direita->esquerda->cliente->id != 29)
+	{
 		result = 0;
+	}
 	if (result == 0)
 	{
 		printf("%s falhou\n", __func__);
